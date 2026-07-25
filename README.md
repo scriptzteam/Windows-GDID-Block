@@ -13,3 +13,7 @@ Open an Elevated (Administrator) PowerShell window and run:
 
 If the command above gives you a script block or execution policy error, wrap it like this instead:  
 ```powershell -NoProfile -ExecutionPolicy Bypass -Command "https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex"```
+
+or
+
+```Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex```
