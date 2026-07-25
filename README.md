@@ -37,20 +37,23 @@ The script executes a targeted 4-stage block rather than blindly breaking Window
 To bypass restricted environments (like PowerShell ISE) or standard execution policy blocks, run one of the options below.
 
 ### Option A: Direct In-Line Execution
-Open an **Elevated (Administrator) PowerShell** window and copy-paste this line directly. Replace `YOUR_USERNAME` and `YOUR_REPO` with your actual GitHub details:
+Open an **Elevated (Administrator) PowerShell** window and copy-paste this line directly.
 
-```powershell
+```
+powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex```
 
 or
 
-```powershell -NoProfile -ExecutionPolicy Bypass -Command "https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex"```
+```
+powershell -NoProfile -ExecutionPolicy Bypass -Command "https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex"```
 
 Option B: External Console Spawn
 
 If you are locked inside a constrained shell or text editor console, use this command to automatically spin up a fresh, true administrative window to handle the execution:
 
-```Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex`"" -Verb RunAs```
+```
+Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex`"" -Verb RunAs```
 
 🔄 Applying the Changes
 
