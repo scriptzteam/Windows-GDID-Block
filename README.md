@@ -40,7 +40,6 @@ To bypass restricted environments (like PowerShell ISE) or standard execution po
 Open an **Elevated (Administrator) PowerShell** window and copy-paste this line directly.
 
 ```
-powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex
 ```
 
