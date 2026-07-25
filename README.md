@@ -8,8 +8,8 @@
 
 Run it:
 
-Open an Elevated (Administrator) PowerShell window and run:
+Open an Elevated (Administrator) PowerShell window and run:  
 ```irm https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex```
 
-If the command above gives you a script block or execution policy error, wrap it like this instead:
+If the command above gives you a script block or execution policy error, wrap it like this instead:  
 ```powershell -NoProfile -ExecutionPolicy Bypass -Command "https://raw.githubusercontent.com/scriptzteam/Windows-GDID-Block/refs/heads/main/gdid-block.ps1 | iex"```
