@@ -1,4 +1,4 @@
-# 🛑 Windows-GDID-Block
+# 🖕 🛑 Windows-GDID-Block
 
 > ⚠️ **Honest disclaimer up front:** this tool does **not** erase your GDID and does
 > **not** make you anonymous. The GDID lives on Microsoft's servers, tied to your
