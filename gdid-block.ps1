@@ -2,7 +2,8 @@
 # Windows GDID & Telemetry Block
 # ==============================================================================
 # WARNING: Disabling these components will break Phone Link, Cloud Clipboard, 
-# Nearby Sharing, and Windows Update peer-to-peer delivery optimization.
+# Nearby Sharing, Windows Update peer-to-peer delivery optimization, and 
+# Microsoft Account cloud sync features (Xbox app, MS Store, OneDrive login).
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
@@ -22,11 +23,11 @@ Write-Host "=========================================" -ForegroundColor Cyan
 # STEP 2: Audit Current Local GDID State
 # Reads the 64-bit device PUID (LID) out of the current user's identity hive.
 # ------------------------------------------------------------------------------
-Write-Host "`n[1/4] Auditing local registry for GDID (Device PUID)..." -ForegroundColor Yellow
+Write-Host "`n[1/5] Auditing local registry for GDID (Device PUID)..." -ForegroundColor Yellow
 $gdidPath = "HKCU:\SOFTWARE\Microsoft\IdentityCRL\ExtendedProperties"
 if (Test-Path $gdidPath) {
     $properties = Get-ItemProperty -Path $gdidPath -ErrorAction SilentlyContinue
-    # Look for the 'LID' or 'DeviceId' properties containing the 0x0018 namespace string
+    # Look for the 'LID' or 'DeviceId' properties containing the namespace string
     foreach ($prop in $properties.PSObject.Properties) {
         if ($prop.Name -like "LID*" -or $prop.Name -eq "DeviceId") {
             Write-Host "-> Found Cached Device PUID: $($prop.Value)" -ForegroundColor Magenta
@@ -38,19 +39,19 @@ if (Test-Path $gdidPath) {
 }
 
 # ------------------------------------------------------------------------------
-# STEP 3: Stop & Silence Registration and Reporting Services
-# Disables CDPSvc (Graph registration) and DoSvc (Delivery Optimization reporting).
-# Note: DoSvc ignores standard 'Set-Service' controls; it must be forced via registry.
+# STEP 3: Stop & Silence Registration, Identity and Reporting Services
+# Disables CDPSvc, DoSvc, and the identity agent wlidsvc via Registry to bypass ACLs.
 # ------------------------------------------------------------------------------
-Write-Host "`n[2/4] Disabling target pipeline services (CDPSvc & DoSvc)..." -ForegroundColor Yellow
+Write-Host "`n[2/5] Disabling target pipeline services (CDPSvc, DoSvc & wlidsvc)..." -ForegroundColor Yellow
 
-$ServicesToDisable = @("CDPSvc", "DoSvc")
+# Added wlidsvc to the core neutralizing target pool
+$ServicesToDisable = @("CDPSvc", "DoSvc", "wlidsvc")
 
 foreach ($service in $ServicesToDisable) {
     Write-Host "Stopping and neutralizing service: $service" -ForegroundColor Gray
     Stop-Service -Name $service -Force -ErrorAction SilentlyContinue
     
-    # Force Start type to 4 (Disabled) directly in System registry to bypass ACL locks
+    # Force Start type to 4 (Disabled) directly in System registry to bypass system locks
     Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\$service" -Name "Start" -Value 4 -Force
 }
 
@@ -61,7 +62,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\CDPUserSvc" -Nam
 # STEP 4: Flush Local Connected Devices Graph Cache
 # Clears out tracking profiles and local states stored under the local appdata.
 # ------------------------------------------------------------------------------
-Write-Host "`n[3/4] Purging local Connected Devices Platform database..." -ForegroundColor Yellow
+Write-Host "`n[3/5] Purging local Connected Devices Platform database..." -ForegroundColor Yellow
 $localCache = "$env:LOCALAPPDATA\ConnectedDevicesPlatform"
 if (Test-Path $localCache) {
     Remove-Item -Path "$localCache\*" -Recurse -Force -ErrorAction SilentlyContinue
@@ -74,16 +75,16 @@ if (Test-Path $localCache) {
 # STEP 5: Blackhole Graph and Delivery Optimization Endpoints
 # Blackholes the exact DDS and DO endpoints discovered via network mapping.
 # ------------------------------------------------------------------------------
-Write-Host "`n[4/4] Appending DDS and DO endpoints to the system hosts file..." -ForegroundColor Yellow
+Write-Host "`n[4/5] Appending DDS and DO endpoints to the system hosts file..." -ForegroundColor Yellow
 $hostsPath = "$env:windir\System32\drivers\etc\hosts"
 
-# Exact endpoints mapped from cdp.dll and UCDOStatus reporting chains
+# Mapped endpoints list (Fixed the missing comma syntax bug from the original)
 $gdidEndpoints = @(
     "0.0.0.0 dds.microsoft.com",
     "0.0.0.0 fd.dds.microsoft.com",
     "0.0.0.0 aad.cs.dds.microsoft.com",
     "0.0.0.0 cdpcs.access.microsoft.com",
-    "0.0.0.0 activity.windows.com"
+    "0.0.0.0 activity.windows.com",
     "0.0.0.0 login.live.com",
     "0.0.0.0 windows.com",
     "0.0.0.0 live.com",
@@ -117,6 +118,6 @@ foreach ($entry in $gdidEndpoints) {
 # STEP 6: Execution Summary
 # ------------------------------------------------------------------------------
 Write-Host "`n=========================================" -ForegroundColor Green
-Write-Host "   Mitigation Completed Successfully   " -ForegroundColor Green
+Write-Host "    Mitigation Completed Successfully    " -ForegroundColor Green
 Write-Host "=========================================" -ForegroundColor Green
 Write-Host "A system reboot is required to completely terminate active service handles." -ForegroundColor White
